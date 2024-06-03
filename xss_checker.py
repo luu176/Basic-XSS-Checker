@@ -1,5 +1,6 @@
 import requests
 import sys
+import argparse
 try:
     from html import escape  # python 3.x
 except ImportError:
@@ -8,9 +9,17 @@ except ImportError:
 # Made by luu176
 
 usage = """
-          Usage: python xss_checker.py --url <url> --payload <payload, default="<script>alert('test');</script>">
+          Usage: python xss_checker.py -u <url> -p <payload, default="<script>alert('test');</script>">
           url needs to end with a equal sign such as ?q=... or ?search=... etc
           """
+
+parser = argparse.ArgumentParser(description=usage)
+
+parser.add_argument('-p', type=str, help="payload, default=<script>alert('fsociety');</script>")
+parser.add_argument('-u', type=str, help='url')
+args = parser.parse_args()
+
+
 
 def xss(url, payload):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36'}
@@ -79,16 +88,19 @@ def xss(url, payload):
     This parameter does NOT seem vulnerable to XSS attack, this is still a very basic tool, so there could be mistakes."""
     
 default_payload = "<script>alert('fsociety');</script>"
-url = sys.argv[2].strip()
 
-try:
-    payload = sys.argv[4].strip()
-except IndexError:
+if args.p:
+    payload = args.p
+else:
     payload = default_payload
-if not len(sys.argv) >= 3:
-    print(url)
+
+if args.u:
+    url = args.u
+else:
+    print(usage)
     exit()
-elif (not url.endswith("=")):
+
+if (not url.endswith("=")):
     print(usage)
     exit()
 elif (not (url.startswith('http') or url.startswith('https'))):
